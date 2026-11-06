@@ -1,0 +1,6 @@
+{
+  "name": "HireNaija - Nigerian Business Directory",
+  "description": "Find and hire trusted Nigerian professionals, mechanics, electricians, tailors, plumbers, and artisans in Lagos, Abuja, and Port Harcourt with verified reviews and direct WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
