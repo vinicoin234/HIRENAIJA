@@ -27,19 +27,29 @@ export function createWhatsAppUrl(phone: string, businessName: string, serviceNa
   return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
 }
 
+import { resolveImageUrl } from './imageAssets';
+
 export function getInitialBusinesses(): Business[] {
   try {
     const stored = localStorage.getItem('hirenaija_businesses_v1');
     if (stored) {
       const parsed = JSON.parse(stored);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        return parsed.map((b: Business) => ({
+          ...b,
+          image: resolveImageUrl(b.image, b.category),
+          gallery: (b.gallery || []).map((img) => resolveImageUrl(img, b.category)),
+        }));
       }
     }
   } catch (e) {
     console.error('Failed to read from localStorage', e);
   }
-  return INITIAL_BUSINESSES;
+  return INITIAL_BUSINESSES.map((b) => ({
+    ...b,
+    image: resolveImageUrl(b.image, b.category),
+    gallery: (b.gallery || []).map((img) => resolveImageUrl(img, b.category)),
+  }));
 }
 
 export function persistBusinesses(businesses: Business[]): void {

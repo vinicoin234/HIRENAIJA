@@ -16,6 +16,7 @@ import {
 import { Business, BusinessCategory, City, Neighborhood, PlanTier, ServiceItem } from '../types';
 import { CATEGORIES, NIGERIAN_CITIES } from '../data/categories';
 import { formatNaira } from '../utils/helpers';
+import { getCategoryDefaultImage, ASSET_IMAGES } from '../utils/imageAssets';
 
 interface RegisterBusinessModalProps {
   isOpen: boolean;
@@ -92,11 +93,7 @@ export const RegisterBusinessModal: React.FC<RegisterBusinessModalProps> = ({
     const startingPrice = services.length > 0 ? Math.min(...services.map((s) => s.price)) : 15000;
 
     // Pick appropriate photo placeholder based on category
-    let image = '/src/assets/images/hero_artisan_lagos_1793884432708.jpg';
-    if (category === 'mechanics') image = '/src/assets/images/pro_mechanic_workshop_1793884435104.jpg';
-    if (category === 'tailors') image = '/src/assets/images/pro_tailor_fashion_1793884434473.jpg';
-    if (category === 'photographers') image = '/src/assets/images/pro_photographer_studio_1793884434563.jpg';
-    if (category === 'electricians') image = '/src/assets/images/pro_electrician_solar_1793884434987.jpg';
+    const image = getCategoryDefaultImage(category);
 
     const newBusiness: Business = {
       id: `biz-user-${Date.now()}`,
@@ -115,7 +112,7 @@ export const RegisterBusinessModal: React.FC<RegisterBusinessModalProps> = ({
       whatsapp: whatsapp.trim() || phone.trim(),
       email: email.trim(),
       image,
-      gallery: [image, '/src/assets/images/hero_artisan_lagos_1793884432708.jpg'],
+      gallery: [image, ASSET_IMAGES.hero],
       plan: selectedPlan,
       verification: cacNumber.trim() ? 'cac_verified' : 'identity_verified',
       cacNumber: cacNumber.trim() || undefined,

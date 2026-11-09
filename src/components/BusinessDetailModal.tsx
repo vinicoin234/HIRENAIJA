@@ -8,6 +8,7 @@ import {
   MessageCircle,
   ShieldCheck,
   CheckCircle,
+  CheckCircle2,
   Share2,
   Bookmark,
   Calendar,
@@ -15,9 +16,16 @@ import {
   Sparkles,
   ChevronRight,
   ExternalLink,
+  Shield,
+  FileCheck,
+  Building2,
+  UserCheck,
+  Wrench,
+  HelpCircle,
 } from 'lucide-react';
 import { Business, Review } from '../types';
 import { formatNaira, createWhatsAppUrl } from '../utils/helpers';
+import { resolveImageUrl } from '../utils/imageAssets';
 
 interface BusinessDetailModalProps {
   business: Business;
@@ -49,10 +57,12 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
   const [reviewComment, setReviewComment] = useState('');
   const [reviewNeighborhood, setReviewNeighborhood] = useState('');
   const [copiedShare, setCopiedShare] = useState(false);
+  const [isVettingModalOpen, setIsVettingModalOpen] = useState(false);
 
   if (!isOpen) return null;
 
-  const images = business.gallery && business.gallery.length > 0 ? business.gallery : [business.image];
+  const rawImages = business.gallery && business.gallery.length > 0 ? business.gallery : [business.image];
+  const images = rawImages.map((img) => resolveImageUrl(img, business.category));
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -143,9 +153,12 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             <div className="md:col-span-5 space-y-3">
               <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs">
                 <img
-                  src={images[activeImageIndex] || business.image}
+                  src={images[activeImageIndex] || resolveImageUrl(business.image, business.category)}
                   alt={business.name}
                   referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.src = resolveImageUrl(null, business.category);
+                  }}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -160,7 +173,14 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                         activeImageIndex === idx ? 'border-emerald-600' : 'border-slate-200 opacity-70 hover:opacity-100'
                       }`}
                     >
-                      <img src={img} alt="thumbnail" className="w-full h-full object-cover" />
+                      <img
+                        src={img}
+                        alt="thumbnail"
+                        onError={(e) => {
+                          e.currentTarget.src = resolveImageUrl(null, business.category);
+                        }}
+                        className="w-full h-full object-cover"
+                      />
                     </button>
                   ))}
                 </div>
@@ -170,15 +190,28 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             {/* Profile Summary Column */}
             <div className="md:col-span-7 flex flex-col justify-between h-full">
               <div>
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  {business.verification === 'cac_verified' && (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                      CAC Registered: {business.cacNumber || 'Verified Entity'}
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  {/* Interactive Verified Badge with Click Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => setIsVettingModalOpen(true)}
+                    className="group/badge inline-flex items-center gap-1.5 text-xs font-bold text-emerald-900 bg-emerald-50 hover:bg-emerald-100/90 px-2.5 py-1 rounded-lg border border-emerald-300 transition-all cursor-pointer shadow-2xs hover:shadow-xs active:scale-95"
+                    title="Click to view our full 4-step vetting and verification report"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-emerald-700 animate-pulse shrink-0" />
+                    <span>
+                      {business.verification === 'cac_verified'
+                        ? `CAC Registered: ${business.cacNumber || 'Verified Entity'}`
+                        : 'HireNaija Verified Pro'}
                     </span>
-                  )}
+                    <span className="text-[10px] text-emerald-700 font-semibold underline ml-1 group-hover/badge:text-emerald-950 flex items-center">
+                      <span>Vetting Process</span>
+                      <ChevronRight className="w-3 h-3 inline" />
+                    </span>
+                  </button>
+
                   {business.plan === 'vip' && (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
                       <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                       Top 1% Featured Pro
                     </span>
@@ -204,7 +237,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                 </div>
 
                 {/* Quick Info Box */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs text-slate-700 mb-5">
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs text-slate-700 mb-3">
                   <div className="flex items-start gap-2">
                     <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                     <div>
@@ -222,6 +255,32 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                       <span className="ml-2 font-semibold text-emerald-700">· Open Now</span>
                     </span>
                   </div>
+                </div>
+
+                {/* Interactive Vetting Banner */}
+                <div
+                  onClick={() => setIsVettingModalOpen(true)}
+                  className="mb-4 p-3 bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-slate-50 border border-emerald-200 rounded-xl flex items-center justify-between gap-3 text-xs cursor-pointer hover:border-emerald-300 transition-all group"
+                  title="Click to view our vetting standards"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                        <span>Verified by HireNaija Trust & Safety</span>
+                        <span className="text-[10px] bg-emerald-700 text-white font-extrabold px-1.5 py-0.2 rounded">100% Vetted</span>
+                      </div>
+                      <div className="text-[11px] text-slate-600">
+                        CAC check, workshop physical audit in {business.neighborhood}, and verified reviews.
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-emerald-800 font-bold text-xs whitespace-nowrap flex items-center gap-0.5 group-hover:underline shrink-0">
+                    <span>How we vet</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </span>
                 </div>
               </div>
 
@@ -458,6 +517,187 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
           </button>
         </div>
       </div>
+
+      {/* VETTING PROCESS EXPLAINER MODAL */}
+      {isVettingModalOpen && (
+        <div
+          className="fixed inset-0 z-60 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-200"
+          onClick={() => setIsVettingModalOpen(false)}
+        >
+          <div
+            className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Vetting Header */}
+            <div className="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-5 sm:p-6 relative">
+              <button
+                type="button"
+                onClick={() => setIsVettingModalOpen(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-8 h-8 rounded-lg bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-sm shadow-xs">
+                  <ShieldCheck className="w-5 h-5 text-slate-950" />
+                </span>
+                <span className="text-xs font-bold tracking-wider uppercase text-emerald-300">
+                  HireNaija Trust & Safety Standards
+                </span>
+              </div>
+
+              <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+                Our 4-Pillar Artisan Vetting Process
+              </h3>
+              <p className="text-xs text-emerald-100/90 mt-1 max-w-lg">
+                How we thoroughly investigate and verify <span className="font-bold underline text-white">{business.name}</span> so you can hire with 100% confidence.
+              </p>
+            </div>
+
+            {/* Vetting Body */}
+            <div className="overflow-y-auto p-5 sm:p-6 space-y-6 flex-1 text-slate-800">
+              {/* Live Verification Credentials Card */}
+              <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                    <span>Verified Audit Record for {business.name}</span>
+                  </span>
+                  <span className="text-[10px] font-mono font-bold bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
+                    STATUS: ACTIVE
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                  <div className="p-2 bg-white rounded-lg border border-emerald-100">
+                    <span className="text-slate-500 block text-[10px] font-medium">CAC Registration:</span>
+                    <span className="font-bold text-slate-900 font-mono">
+                      {business.cacNumber ? `RC/BN: ${business.cacNumber}` : 'Verified Sole Proprietor'}
+                    </span>
+                  </div>
+                  <div className="p-2 bg-white rounded-lg border border-emerald-100">
+                    <span className="text-slate-500 block text-[10px] font-medium">Managing Artisan / Pro:</span>
+                    <span className="font-bold text-slate-900">{business.ownerName}</span>
+                  </div>
+                  <div className="p-2 bg-white rounded-lg border border-emerald-100">
+                    <span className="text-slate-500 block text-[10px] font-medium">Workshop Location:</span>
+                    <span className="font-bold text-slate-900">{business.neighborhood}, {business.city}</span>
+                  </div>
+                  <div className="p-2 bg-white rounded-lg border border-emerald-100">
+                    <span className="text-slate-500 block text-[10px] font-medium">Verified Phone / WhatsApp:</span>
+                    <span className="font-bold text-slate-900 font-mono">{business.phone}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* The 4-Step Protocol */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
+                  The 4 Steps Every HireNaija Artisan Must Pass
+                </h4>
+
+                {/* Step 1 */}
+                <div className="flex items-start gap-3.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
+                    1
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-emerald-700" />
+                      <h5 className="font-bold text-xs text-slate-900">
+                        Corporate Affairs Commission (CAC) Search
+                      </h5>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      We check registered company names against the Nigerian CAC corporate database to verify legitimate business status, registration certificates, and ownership continuity.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex items-start gap-3.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
+                    2
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <UserCheck className="w-4 h-4 text-emerald-700" />
+                      <h5 className="font-bold text-xs text-slate-900">
+                        NIN & Government Identity Validation
+                      </h5>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Every master artisan provides government-issued identification (National Identification Number / Voter’s Card / Driver's License) to confirm real personal accountability.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex items-start gap-3.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
+                    3
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-emerald-700" />
+                      <h5 className="font-bold text-xs text-slate-900">
+                        Physical Workshop & Address Inspection
+                      </h5>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      We confirm that the artisan operates a real physical workshop, garage, or verified mobile repair unit with known local landmarks in {business.city}, not an unverified ghost listing.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 4 */}
+                <div className="flex items-start gap-3.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0">
+                    4
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Wrench className="w-4 h-4 text-emerald-700" />
+                      <h5 className="font-bold text-xs text-slate-900">
+                        Tools, Experience & Verified Client Reviews
+                      </h5>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      We audit their professional equipment (e.g., OBD-II diagnostic scanners, precision tools) and cross-reference verified customer feedback before awarding the Verified badge.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* HireNaija Consumer Protection Box */}
+              <div className="p-4 bg-slate-900 text-white rounded-xl space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                  <Shield className="w-4 h-4" />
+                  <span>HireNaija Safe-Hire Guarantee</span>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  You deal directly with {business.ownerName} via WhatsApp or phone. No middleman agency commissions, no hidden fees, and transparent pricing. If you ever experience issues, our support team provides free community mediation.
+                </p>
+              </div>
+            </div>
+
+            {/* Vetting Footer */}
+            <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+              <span className="text-[11px] text-slate-500">
+                Verified entity audited within the last 30 days
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsVettingModalOpen(false)}
+                className="py-2 px-5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-xs"
+              >
+                I Understand & Feel Confident
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

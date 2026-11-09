@@ -2,6 +2,7 @@ import React from 'react';
 import { Search, MapPin, ShieldCheck, PhoneCall, CheckCircle2 } from 'lucide-react';
 import { BusinessCategory, City, Neighborhood } from '../types';
 import { CATEGORIES, NIGERIAN_CITIES } from '../data/categories';
+import { ASSET_IMAGES } from '../utils/imageAssets';
 
 interface HeroSectionProps {
   searchQuery: string;
@@ -197,9 +198,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <div className="lg:col-span-5 relative flex items-center justify-center">
             <div className="relative w-full h-[320px] sm:h-[400px] lg:h-[440px] rounded-2xl overflow-hidden shadow-md border border-slate-200">
               <img
-                src="/src/assets/images/hero_artisan_lagos_1793884432708.jpg"
+                src={ASSET_IMAGES.hero}
                 alt="Skilled Nigerian artisans at work in a modern workshop"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/hero_artisan_lagos_1793884432708.jpg';
+                }}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />

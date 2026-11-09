@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Bookmark, Phone, MessageCircle, Star, MapPin } from 'lucide-react';
 import { Business } from '../types';
 import { createWhatsAppUrl } from '../utils/helpers';
+import { resolveImageUrl } from '../utils/imageAssets';
 
 interface BookmarksModalProps {
   isOpen: boolean;
@@ -57,8 +58,11 @@ export const BookmarksModal: React.FC<BookmarksModalProps> = ({
                   className="flex items-center gap-3 cursor-pointer min-w-0 flex-1"
                 >
                   <img
-                    src={biz.image}
+                    src={resolveImageUrl(biz.image, biz.category)}
                     alt={biz.name}
+                    onError={(e) => {
+                      e.currentTarget.src = resolveImageUrl(null, biz.category);
+                    }}
                     className="w-12 h-12 rounded-lg object-cover shrink-0"
                   />
                   <div className="min-w-0">
