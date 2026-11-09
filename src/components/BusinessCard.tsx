@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Business } from '../types';
 import { formatNaira, createWhatsAppUrl } from '../utils/helpers';
-import { resolveImageUrl } from '../utils/imageAssets';
+import { OptimizedImage } from './OptimizedImage';
 
 interface BusinessCardProps {
   business: Business;
@@ -62,16 +62,14 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
     >
       {/* Top Banner & Photo Showcase */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
-        <img
-          src={resolveImageUrl(business.image, business.category)}
+        <OptimizedImage
+          src={business.image}
           alt={business.name}
-          referrerPolicy="no-referrer"
-          onError={(e) => {
-            e.currentTarget.src = resolveImageUrl(null, business.category);
-          }}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          category={business.category}
+          width={600}
+          className="w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-black/20 pointer-events-none" />
 
         {/* Top Badges / Indicators */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between">

@@ -26,6 +26,7 @@ import {
 import { Business, Review } from '../types';
 import { formatNaira, createWhatsAppUrl } from '../utils/helpers';
 import { resolveImageUrl } from '../utils/imageAssets';
+import { OptimizedImage } from './OptimizedImage';
 
 interface BusinessDetailModalProps {
   business: Business;
@@ -152,14 +153,13 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             {/* Gallery Column */}
             <div className="md:col-span-5 space-y-3">
               <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs">
-                <img
-                  src={images[activeImageIndex] || resolveImageUrl(business.image, business.category)}
+                <OptimizedImage
+                  src={images[activeImageIndex] || business.image}
                   alt={business.name}
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    e.currentTarget.src = resolveImageUrl(null, business.category);
-                  }}
-                  className="w-full h-full object-cover"
+                  category={business.category}
+                  width={800}
+                  priority={true}
+                  className="w-full h-full"
                 />
               </div>
 
@@ -173,13 +173,12 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                         activeImageIndex === idx ? 'border-emerald-600' : 'border-slate-200 opacity-70 hover:opacity-100'
                       }`}
                     >
-                      <img
+                      <OptimizedImage
                         src={img}
                         alt="thumbnail"
-                        onError={(e) => {
-                          e.currentTarget.src = resolveImageUrl(null, business.category);
-                        }}
-                        className="w-full h-full object-cover"
+                        category={business.category}
+                        width={120}
+                        className="w-full h-full"
                       />
                     </button>
                   ))}
