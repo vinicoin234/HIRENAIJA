@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { Business, QuoteRequest, PlanTier } from '../types';
 import { formatNaira, cleanPhoneForWhatsApp } from '../utils/helpers';
-import { OptimizedImage } from './OptimizedImage';
+import { Image } from './ui/Image';
 
 interface BusinessDashboardModalProps {
   businesses: Business[];
@@ -107,7 +107,7 @@ export const BusinessDashboardModal: React.FC<BusinessDashboardModalProps> = ({
       {/* Active Business Banner & Current Plan Status */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <OptimizedImage
+          <Image
             src={activeBiz.image}
             alt={activeBiz.name}
             category={activeBiz.category}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bookmark, PlusCircle, User, LogOut, ChevronDown, Wrench, Shield } from 'lucide-react';
 import { AuthUser } from '../types';
+import { Image } from './ui/Image';
 
 interface HeaderProps {
   activeTab: 'browse' | 'jobs' | 'dashboard' | 'revenue';
@@ -114,9 +115,11 @@ export const Header: React.FC<HeaderProps> = ({
                   className="flex items-center gap-2 p-1.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white shadow-xs cursor-pointer focus:outline-none"
                 >
                   {currentUser.avatarUrl ? (
-                    <img
+                    <Image
                       src={currentUser.avatarUrl}
                       alt={currentUser.fullName}
+                      width={28}
+                      height={28}
                       className="w-7 h-7 rounded-lg object-cover"
                     />
                   ) : (

@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Business } from '../types';
 import { formatNaira, createWhatsAppUrl } from '../utils/helpers';
-import { OptimizedImage } from './OptimizedImage';
+import { Image } from './ui/Image';
 
 interface BusinessCardProps {
   business: Business;
@@ -62,7 +62,7 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({
     >
       {/* Top Banner & Photo Showcase */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
-        <OptimizedImage
+        <Image
           src={business.image}
           alt={business.name}
           category={business.category}

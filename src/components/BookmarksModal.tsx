@@ -2,7 +2,7 @@ import React from 'react';
 import { X, Bookmark, Phone, MessageCircle, Star, MapPin } from 'lucide-react';
 import { Business } from '../types';
 import { createWhatsAppUrl } from '../utils/helpers';
-import { OptimizedImage } from './OptimizedImage';
+import { Image } from './ui/Image';
 
 interface BookmarksModalProps {
   isOpen: boolean;
@@ -57,7 +57,7 @@ export const BookmarksModal: React.FC<BookmarksModalProps> = ({
                   }}
                   className="flex items-center gap-3 cursor-pointer min-w-0 flex-1"
                 >
-                  <OptimizedImage
+                  <Image
                     src={biz.image}
                     alt={biz.name}
                     category={biz.category}

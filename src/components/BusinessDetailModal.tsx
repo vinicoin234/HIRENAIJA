@@ -26,7 +26,7 @@ import {
 import { Business, Review } from '../types';
 import { formatNaira, createWhatsAppUrl } from '../utils/helpers';
 import { resolveImageUrl } from '../utils/imageAssets';
-import { OptimizedImage } from './OptimizedImage';
+import { Image } from './ui/Image';
 
 interface BusinessDetailModalProps {
   business: Business;
@@ -153,7 +153,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             {/* Gallery Column */}
             <div className="md:col-span-5 space-y-3">
               <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs">
-                <OptimizedImage
+                <Image
                   src={images[activeImageIndex] || business.image}
                   alt={business.name}
                   category={business.category}
@@ -173,7 +173,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                         activeImageIndex === idx ? 'border-emerald-600' : 'border-slate-200 opacity-70 hover:opacity-100'
                       }`}
                     >
-                      <OptimizedImage
+                      <Image
                         src={img}
                         alt="thumbnail"
                         category={business.category}
