@@ -183,15 +183,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </div>
             </div>
 
-            {/* Quick action / Post Request */}
-            <div className="flex items-center gap-3 text-xs text-slate-500">
-              <span className="text-slate-700 font-medium">In a hurry?</span>
-              <button
-                onClick={onPostJobClick}
-                className="text-emerald-700 font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer"
+            {/* Quick action / Post Request & App Download */}
+            <div className="flex flex-wrap items-center gap-y-2 gap-x-3 text-xs text-slate-500">
+              <div className="flex items-center gap-1.5">
+                <span className="text-slate-700 font-medium">In a hurry?</span>
+                <button
+                  onClick={onPostJobClick}
+                  className="text-emerald-700 font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  Post an artisan job request →
+                </button>
+              </div>
+              <span className="text-slate-300 hidden sm:inline">·</span>
+              <a
+                href="/downloads/HireNaija-v1.2.0.apk"
+                download="HireNaija-v1.2.0.apk"
+                className="inline-flex items-center gap-1 font-semibold text-emerald-800 hover:text-emerald-950 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 transition-colors cursor-pointer"
               >
-                Post an artisan job request in 60 seconds →
-              </button>
+                <span>📱 Download Android APK (19 MB)</span>
+              </a>
             </div>
           </div>
 

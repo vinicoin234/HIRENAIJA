@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, MessageCircle, Phone, MapPin } from 'lucide-react';
+import { ShieldCheck, MessageCircle, Phone, MapPin, Smartphone, Download } from 'lucide-react';
 import { CATEGORIES } from '../data/categories';
 import { BusinessCategory } from '../types';
 
@@ -7,6 +7,7 @@ interface FooterProps {
   onSelectCategory: (cat: BusinessCategory) => void;
   onOpenRegister: () => void;
   onOpenPostJob: () => void;
+  onOpenDownloadModal: () => void;
   onNavigateTab: (tab: 'browse' | 'jobs' | 'dashboard' | 'revenue') => void;
 }
 
@@ -14,6 +15,7 @@ export const Footer: React.FC<FooterProps> = ({
   onSelectCategory,
   onOpenRegister,
   onOpenPostJob,
+  onOpenDownloadModal,
   onNavigateTab,
 }) => {
   return (
@@ -39,6 +41,32 @@ export const Footer: React.FC<FooterProps> = ({
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                 <span>Corporate Affairs Commission (CAC) Verification Partner</span>
+              </div>
+            </div>
+
+            {/* Android APK Download Card in Footer */}
+            <div className="pt-2">
+              <div className="p-3 bg-slate-800/80 rounded-xl border border-slate-700/80 max-w-sm flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                    <Smartphone className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <span>Android App (APK)</span>
+                      <span className="text-[9px] bg-emerald-600 text-white font-bold px-1 rounded">v1.2.0</span>
+                    </div>
+                    <div className="text-[11px] text-slate-400">19.1 MB · Offline search</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={onOpenDownloadModal}
+                  className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1 shrink-0"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download</span>
+                </button>
               </div>
             </div>
           </div>
@@ -85,6 +113,15 @@ export const Footer: React.FC<FooterProps> = ({
                   className="hover:text-white transition-colors cursor-pointer"
                 >
                   Revenue Blueprint
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={onOpenDownloadModal}
+                  className="hover:text-emerald-400 text-emerald-400 font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span>Download Android App (APK)</span>
                 </button>
               </li>
             </ul>
