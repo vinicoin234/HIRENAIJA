@@ -329,3 +329,125 @@ export async function recordPaymentToSupabase(
     return false;
   }
 }
+
+// ==============================================================================
+// SUPABASE AUTH & GOOGLE OAUTH
+// ==============================================================================
+
+import { AuthUser } from '../types';
+
+export function mapSupabaseUserToAuthUser(user: any): AuthUser {
+  return {
+    id: user.id,
+    email: user.email,
+    fullName:
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      user.email?.split('@')[0] ||
+      'User',
+    phone: user.user_metadata?.phone || '',
+    role: (user.user_metadata?.role as any) || 'customer',
+    avatarUrl: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+  };
+}
+
+export async function signInWithGoogle(): Promise<{ error: string | null }> {
+  try {
+    const redirectUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+    if (error) {
+      return { error: error.message };
+    }
+    return { error: null };
+  } catch (err: any) {
+    return { error: err.message || 'Google Sign-in failed' };
+  }
+}
+
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  fullName: string,
+  phone: string,
+  role: 'customer' | 'artisan'
+): Promise<{ user: AuthUser | null; error: string | null }> {
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          phone: phone,
+          role: role,
+        },
+      },
+    });
+
+    if (error) {
+      return { user: null, error: error.message };
+    }
+
+    if (data.user) {
+      return { user: mapSupabaseUserToAuthUser(data.user), error: null };
+    }
+
+    return { user: null, error: null };
+  } catch (err: any) {
+    return { user: null, error: err.message || 'Sign up failed' };
+  }
+}
+
+export async function signInWithEmail(
+  email: string,
+  password: string
+): Promise<{ user: AuthUser | null; error: string | null }> {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return { user: null, error: error.message };
+    }
+
+    if (data.user) {
+      return { user: mapSupabaseUserToAuthUser(data.user), error: null };
+    }
+
+    return { user: null, error: 'User not found' };
+  } catch (err: any) {
+    return { user: null, error: err.message || 'Sign in failed' };
+  }
+}
+
+export async function signOutUser(): Promise<{ error: string | null }> {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) return { error: error.message };
+    return { error: null };
+  } catch (err: any) {
+    return { error: err.message || 'Sign out failed' };
+  }
+}
+
+export async function getCurrentAuthUser(): Promise<AuthUser | null> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+    return mapSupabaseUserToAuthUser(user);
+  } catch {
+    return null;
+  }
+}
+

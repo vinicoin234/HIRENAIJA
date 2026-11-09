@@ -16,6 +16,7 @@ import { BusinessDashboardModal } from './components/BusinessDashboardModal';
 import { PaystackCheckoutModal } from './components/PaystackCheckoutModal';
 import { BookmarksModal } from './components/BookmarksModal';
 import { RegisterBusinessModal } from './components/RegisterBusinessModal';
+import { AuthModal } from './components/AuthModal';
 import { RevenueModelSection } from './components/RevenueModelSection';
 import { Footer } from './components/Footer';
 
@@ -28,6 +29,7 @@ import {
   QuoteRequest,
   PlanTier,
   Review,
+  AuthUser,
 } from './types';
 
 import {
@@ -49,6 +51,9 @@ import {
   insertQuoteRequestToSupabase,
   insertReviewToSupabase,
   recordPaymentToSupabase,
+  getCurrentAuthUser,
+  signOutUser,
+  supabase,
 } from './lib/supabase';
 
 export default function App() {
@@ -75,6 +80,17 @@ export default function App() {
   const [isPostJobOpen, setIsPostJobOpen] = useState(false);
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
 
+  // Auth State (Supabase Auth & Google Cloud OAuth)
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [authModal, setAuthModal] = useState<{
+    isOpen: boolean;
+    mode: 'signin' | 'signup';
+    message?: string;
+  }>({
+    isOpen: false,
+    mode: 'signup',
+  });
+
   // Paystack checkout modal state
   const [paystackCheckout, setPaystackCheckout] = useState<{
     isOpen: boolean;
@@ -92,6 +108,42 @@ export default function App() {
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Auth state listener & initialization
+  useEffect(() => {
+    getCurrentAuthUser().then((user) => {
+      if (user) setCurrentUser(user);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setCurrentUser({
+          id: session.user.id,
+          email: session.user.email,
+          fullName:
+            session.user.user_metadata?.full_name ||
+            session.user.user_metadata?.name ||
+            session.user.email?.split('@')[0] ||
+            'User',
+          phone: session.user.user_metadata?.phone || '',
+          role: (session.user.user_metadata?.role as any) || 'customer',
+          avatarUrl: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
+        });
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOutUser();
+    setCurrentUser(null);
+    showToast('Signed out of HireNaija');
   };
 
   // Load live data from Supabase on startup
@@ -350,13 +402,26 @@ export default function App() {
         </div>
       )}
 
-      {/* Header conforming to Top Bar Contract */}
+      {/* Header with Auth state & Google OAuth login button */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onOpenRegister={() => setIsRegisterOpen(true)}
+        onOpenRegister={() => {
+          if (!currentUser) {
+            setAuthModal({
+              isOpen: true,
+              mode: 'signup',
+              message: 'Create a free artisan account first to list your Nigerian business!',
+            });
+          } else {
+            setIsRegisterOpen(true);
+          }
+        }}
         onOpenBookmarks={() => setIsBookmarksOpen(true)}
         bookmarkCount={bookmarks.length}
+        currentUser={currentUser}
+        onOpenAuth={(mode) => setAuthModal({ isOpen: true, mode })}
+        onSignOut={handleSignOut}
       />
 
       {/* Main Content Area based on Active Tab */}
@@ -492,6 +557,21 @@ export default function App() {
         bookmarkedBusinesses={bookmarkedBusinesses}
         onRemoveBookmark={handleToggleBookmark}
         onSelectBusiness={handleRecordView}
+      />
+
+      <AuthModal
+        isOpen={authModal.isOpen}
+        initialMode={authModal.mode}
+        intendedActionMessage={authModal.message}
+        onClose={() => setAuthModal((prev) => ({ ...prev, isOpen: false }))}
+        onAuthSuccess={(user, welcomeMsg) => {
+          setCurrentUser(user);
+          showToast(welcomeMsg);
+          // If the user intended to list their business, open the register modal
+          if (authModal.message?.includes('list your Nigerian business')) {
+            setTimeout(() => setIsRegisterOpen(true), 300);
+          }
+        }}
       />
 
       {/* Footer */}

@@ -153,3 +153,13 @@ export interface JobLead {
   status: 'open' | 'awarded' | 'completed';
   bidsCount: number;
 }
+
+export interface AuthUser {
+  id: string;
+  email?: string;
+  fullName: string;
+  phone?: string;
+  role: 'customer' | 'artisan' | 'admin';
+  avatarUrl?: string;
+}
+
