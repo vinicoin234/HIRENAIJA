@@ -5,26 +5,26 @@ import proTailor from '../assets/images/pro_tailor_fashion_1793884434473.jpg';
 import proPhotographer from '../assets/images/pro_photographer_studio_1793884434563.jpg';
 
 export const ASSET_IMAGES = {
-  hero: heroArtisan,
-  mechanic: proMechanic,
-  electrician: proElectrician,
-  tailor: proTailor,
-  photographer: proPhotographer,
-  default: heroArtisan,
+  hero: '/images/hero_artisan_lagos_1793884432708.jpg',
+  mechanic: '/images/pro_mechanic_workshop_1793884435104.jpg',
+  electrician: '/images/pro_electrician_solar_1793884434987.jpg',
+  tailor: '/images/pro_tailor_fashion_1793884434473.jpg',
+  photographer: '/images/pro_photographer_studio_1793884434563.jpg',
+  default: '/images/hero_artisan_lagos_1793884432708.jpg',
 };
 
 export function getCategoryDefaultImage(category: string): string {
   switch (category) {
     case 'mechanics':
-      return ASSET_IMAGES.mechanic;
+      return '/images/pro_mechanic_workshop_1793884435104.jpg';
     case 'electricians':
-      return ASSET_IMAGES.electrician;
+      return '/images/pro_electrician_solar_1793884434987.jpg';
     case 'tailors':
-      return ASSET_IMAGES.tailor;
+      return '/images/pro_tailor_fashion_1793884434473.jpg';
     case 'photographers':
-      return ASSET_IMAGES.photographer;
+      return '/images/pro_photographer_studio_1793884434563.jpg';
     default:
-      return ASSET_IMAGES.hero;
+      return '/images/hero_artisan_lagos_1793884432708.jpg';
   }
 }
 
