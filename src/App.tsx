@@ -41,6 +41,16 @@ import {
   persistQuoteRequests,
 } from './utils/helpers';
 
+import {
+  fetchBusinessesFromSupabase,
+  insertBusinessToSupabase,
+  fetchJobLeadsFromSupabase,
+  insertJobLeadToSupabase,
+  insertQuoteRequestToSupabase,
+  insertReviewToSupabase,
+  recordPaymentToSupabase,
+} from './lib/supabase';
+
 export default function App() {
   // Navigation tab
   const [activeTab, setActiveTab] = useState<'browse' | 'jobs' | 'dashboard' | 'revenue'>('browse');
@@ -84,7 +94,33 @@ export default function App() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Sync state to local storage
+  // Load live data from Supabase on startup
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSupabaseData() {
+      try {
+        const [supabaseBusinesses, supabaseJobs] = await Promise.all([
+          fetchBusinessesFromSupabase(),
+          fetchJobLeadsFromSupabase(),
+        ]);
+
+        if (isMounted && supabaseBusinesses && supabaseBusinesses.length > 0) {
+          setBusinesses(supabaseBusinesses);
+        }
+        if (isMounted && supabaseJobs && supabaseJobs.length > 0) {
+          setJobLeads(supabaseJobs);
+        }
+      } catch (err) {
+        console.warn('Initial Supabase sync check:', err);
+      }
+    }
+    loadSupabaseData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Sync state to local storage as resilient offline cache
   useEffect(() => {
     persistBusinesses(businesses);
   }, [businesses]);
@@ -204,6 +240,8 @@ export default function App() {
       });
     }
 
+    // Persist to Supabase
+    insertReviewToSupabase(businessId, newRev);
     showToast('Review submitted successfully!');
   };
 
@@ -227,6 +265,8 @@ export default function App() {
       )
     );
 
+    // Persist to Supabase
+    insertQuoteRequestToSupabase(newQuote);
     showToast('Quote request logged with pro!');
   };
 
@@ -234,6 +274,8 @@ export default function App() {
   const handleRegisterComplete = (newBusiness: Business) => {
     setBusinesses((prev) => [newBusiness, ...prev]);
     setIsRegisterOpen(false);
+    // Persist to Supabase
+    insertBusinessToSupabase(newBusiness);
     showToast(`"${newBusiness.name}" is now live on HireNaija!`);
   };
 
@@ -249,6 +291,8 @@ export default function App() {
       bidsCount: 0,
     };
     setJobLeads((prev) => [newJob, ...prev]);
+    // Persist to Supabase
+    insertJobLeadToSupabase(newJob);
     showToast('Job request published to neighborhood board!');
     setActiveTab('jobs');
   };
@@ -277,6 +321,17 @@ export default function App() {
             : b
         )
       );
+
+      // Record in Supabase
+      const amountNaira = tier === 'starter' ? 5000 : tier === 'growth' ? 10000 : 20000;
+      recordPaymentToSupabase(
+        bizId,
+        tier,
+        amountNaira,
+        `HN-${tier.toUpperCase()}-${Date.now()}`,
+        'merchant@hirenaija.ng'
+      );
+
       showToast(`Subscription activated! Your business is now a ${tier.toUpperCase()} Pro.`);
     }
   };
