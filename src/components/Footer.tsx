@@ -53,7 +53,7 @@ export const Footer: React.FC<FooterProps> = ({
                   </div>
                   <div>
                     <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                      <span>Android App (APK)</span>
+                      <span>Android App</span>
                       <span className="text-[9px] bg-emerald-600 text-white font-bold px-1 rounded">v1.2.0</span>
                     </div>
                     <div className="text-[11px] text-slate-400">19.1 MB · Offline search</div>
@@ -121,7 +121,7 @@ export const Footer: React.FC<FooterProps> = ({
                   className="hover:text-emerald-400 text-emerald-400 font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   <Smartphone className="w-3.5 h-3.5" />
-                  <span>Download Android App (APK)</span>
+                  <span>Download Android App</span>
                 </button>
               </li>
             </ul>
