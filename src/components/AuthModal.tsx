@@ -41,12 +41,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsGoogleLoading(true);
     setErrorMessage(null);
     try {
-      const { error } = await signInWithGoogle();
+      const { user, error } = await signInWithGoogle();
+      setIsGoogleLoading(false);
       if (error) {
         setErrorMessage(error);
-        setIsGoogleLoading(false);
+        return;
       }
-      // If successful, Supabase redirects to the Google consent screen and back
+      if (user) {
+        onAuthSuccess(user, `Signed in with Google as ${user.fullName}`);
+        onClose();
+      }
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to initiate Google sign-in');
       setIsGoogleLoading(false);

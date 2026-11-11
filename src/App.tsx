@@ -20,6 +20,7 @@ import { AuthModal } from './components/AuthModal';
 import { DownloadAppModal } from './components/DownloadAppModal';
 import { RevenueModelSection } from './components/RevenueModelSection';
 import { Footer } from './components/Footer';
+import { LoginPage } from './components/LoginPage';
 
 import {
   Business,
@@ -394,6 +395,25 @@ export default function App() {
   const bookmarkedBusinesses = React.useMemo(() => {
     return businesses.filter((b) => bookmarks.includes(b.id));
   }, [businesses, bookmarks]);
+
+  // Everybody must signup or sign in to use the app
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
+        {toastMessage && (
+          <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg border border-slate-700 text-xs font-semibold animate-in fade-in slide-in-from-bottom-2">
+            {toastMessage}
+          </div>
+        )}
+        <LoginPage
+          onAuthSuccess={(user, welcomeMsg) => {
+            setCurrentUser(user);
+            showToast(welcomeMsg);
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-emerald-700 selection:text-white">
